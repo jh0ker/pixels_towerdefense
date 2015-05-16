@@ -22,8 +22,8 @@ if hasSerialPortParameter:
     print "INITIALIZING WITH USB-PORT: "+serialPort
     ledDisplay = led.teensy.TeensyDisplay( serialPort, fallbackSize )
 else:
-    print "INITIALIZING WITH SIMULATOR ONLY."
-    ledDisplay = led.teensy.TeensyDisplay( None, fallbackSize )
+    print "INITIALIZING WITH DisplayServerClientDisplay AND SIMULATOR."
+    ledDisplay = led.dsclient.DisplayServerClientDisplay('localhost', 8123)
 
 # use same size for sim and real LED panel
 size = ledDisplay.size()
@@ -32,10 +32,10 @@ screen = pygame.Surface(size)
 
 # every time an alien spawns...
 alienFrequency = 4000
-alienSpeed = 0.01
+alienSpeed = 200
 alienHp = 10.0
 
-alienSpeedFactor = 1.01
+alienSpeedAdd = -5
 alienFrequencyFactor = 1.01
 alienHpFactor = 1.05
 
@@ -48,16 +48,8 @@ def expandRect(rect, px):
     return _rect
 
 class Animation:
-    def __init__(self):
-        self._lastMove = pygame.time.get_ticks()
-
-    def linearMove(self, x, y, speed):
-        distance = (pygame.time.get_ticks() - self._lastMove) * speed
-        if distance >= 1:
-            self._lastMove = pygame.time.get_ticks()
-            return self.rect.move(x * distance, y * distance)
-
-        return self.rect
+    def linearMove(self, x, y):
+        return self.rect.move(x, y)
 
 class Cursor(pygame.sprite.Sprite):
     def __init__(self):
@@ -80,7 +72,6 @@ class Cursor(pygame.sprite.Sprite):
 class Alien(pygame.sprite.Sprite, Animation):
     def __init__(self, hp=10.0):
         pygame.sprite.Sprite.__init__(self)
-        Animation.__init__(self)
 
         self.image = pygame.Surface((2, 2))
         self.image.fill(GREEN)
@@ -94,26 +85,23 @@ class Alien(pygame.sprite.Sprite, Animation):
         #self.rect.y = random.randint(0, screen.get_rect().height - self.rect.height)
 
     def update(self, *args):
-            
+        
         if self.rect.x <= 20 and self.rect.y == 9:
-            _rect = self.linearMove(-1, 0, alienSpeed)
+            _rect = self.linearMove(-1, 0)
         elif self.rect.x % 12 == 0:
             if self.rect.y < 16:
-                _rect = self.linearMove(0, 1, alienSpeed)
+                _rect = self.linearMove(0, 1)
             else:
-                _rect = self.linearMove(-1, 0, alienSpeed)
+                _rect = self.linearMove(-1, 0)
         elif self.rect.x % 6 == 0:
             if self.rect.y > 2:
-                _rect = self.linearMove(0, -1, alienSpeed)
+                _rect = self.linearMove(0, -1)
             else:
-                _rect = self.linearMove(-1, 0, alienSpeed)
+                _rect = self.linearMove(-1, 0)
         else: 
-            _rect = self.linearMove(-1, 0, alienSpeed)
+            _rect = self.linearMove(-1, 0)
 
-        if not _rect.colliderect(screen.get_rect()):
-            self.kill(self.maxhp)
-        else:
-            self.rect = _rect
+        self.rect = _rect
 
     def kill(self, damage = 3.34):
         
@@ -133,6 +121,11 @@ class Alien(pygame.sprite.Sprite, Animation):
             else:
                 self.image.fill(GREEN)
 
+class Path(Alien):
+    def __init__(self):
+        Alien.__init__(self)
+        self.image.fill(pygame.Color(50, 50, 50))
+        
 class Tower(pygame.sprite.Sprite):
     def __init__(self, cursor):
         pygame.sprite.Sprite.__init__(self)
@@ -160,7 +153,7 @@ class Target(pygame.sprite.Sprite):
         self.image = pygame.Surface((2, 2))
         self.image.fill(pygame.Color(255,255,255))
         self.rect = self.image.get_rect()
-        self.rect.midleft = (16, 10)
+        self.rect.midleft = (14, 10)
 
 def main():
     global alienSpeed, alienFrequency, alienHp, money, life
@@ -181,6 +174,18 @@ def main():
     movementX = 0
     movementY = 0
     lastAlien = 0
+    
+    path = pygame.sprite.Group()
+    
+    for c in range(227):
+        tile = Path()
+        for c2 in range(c):
+            tile.update()
+        path.add(tile)
+        
+    bg = pygame.Surface(size).convert_alpha()
+    
+    path.draw(bg)
 
     while True:
         for event in pygame.event.get():
@@ -212,7 +217,7 @@ def main():
             # spawn new alien :)
             aliens.add(Alien(alienHp))
             lastAlien = pygame.time.get_ticks()
-            alienSpeed *= alienSpeedFactor
+            alienSpeed += alienSpeedAdd
             alienFrequency /= alienFrequencyFactor
             alienHp *= alienHpFactor
 
@@ -225,15 +230,18 @@ def main():
 
         if targhit != None:
             screen.fill(RED)
-            targhit.kill(100.0)
+            targhit.kill(targhit.maxhp)
             life -= 1
         else:
             screen.fill(BLACK)
-
+        
+        screen.blit(bg, (0,0))
+        
         player.update()
+        if pygame.time.get_ticks() % alienSpeed <= 30:
+            aliens.update()
         towers.update(aliens)
-        aliens.update()
-
+        
         towers.draw(screen)
         aliens.draw(screen)
         player.draw(screen)
@@ -245,7 +253,6 @@ def main():
         if life > 0:
             pygame.draw.aaline(screen, WHITE, (1, 1), (life + 1, 1),1)
         
-
         simDisplay.update(screen)
         ledDisplay.update(screen)
 
