@@ -4,8 +4,6 @@ from pygame.locals import *
 """ A very simple arcade shooter demo :)
 """
 
-random.seed()
-
 BLACK = pygame.Color(0,0,0)
 WHITE = pygame.Color(255, 255, 255)
 GREEN = pygame.Color(0, 255, 0)
@@ -33,11 +31,17 @@ simDisplay = led.sim.SimDisplay(size)
 screen = pygame.Surface(size)
 
 # every time an alien spawns...
-alienFrequency = 5000
+alienFrequency = 4000
 alienSpeed = 0.01
+alienHp = 10.0
 
 alienSpeedFactor = 1.01
-alienFrequencyFactor = 1.02
+alienFrequencyFactor = 1.01
+alienHpFactor = 1.05
+
+money = 6
+life = 3
+
 
 def expandRect(rect, px):
     _rect = pygame.Rect(rect.x - px, rect.y - px, rect.width + px*2, rect.height + px*2);
@@ -90,7 +94,7 @@ class Alien(pygame.sprite.Sprite, Animation):
         #self.rect.y = random.randint(0, screen.get_rect().height - self.rect.height)
 
     def update(self, *args):
-    
+            
         if self.rect.x <= 20 and self.rect.y == 9:
             _rect = self.linearMove(-1, 0, alienSpeed)
         elif self.rect.x % 12 == 0:
@@ -112,10 +116,13 @@ class Alien(pygame.sprite.Sprite, Animation):
             self.rect = _rect
 
     def kill(self, damage = 3.34):
+        
+        global money
         self.hp -= damage
         
         if self.hp <= 0:
             super(Alien, self).kill()
+            money += 1
         else:
             percent = float(self.hp) / self.maxhp
             
@@ -156,7 +163,7 @@ class Target(pygame.sprite.Sprite):
         self.rect.midleft = (16, 10)
 
 def main():
-    global alienSpeed, alienFrequency
+    global alienSpeed, alienFrequency, alienHp, money, life
 
     clock = pygame.time.Clock()
 
@@ -190,8 +197,9 @@ def main():
                     movementX = 1
                 elif event.key == K_LEFT:
                     movementX = -1
-                elif event.key == K_SPACE:
+                elif event.key == K_SPACE and money >= 3:
                     towers.add(Tower(cursor))
+                    money -= 3
 
             elif event.type == KEYUP:
                 if event.key == K_UP or event.key == K_DOWN:
@@ -202,10 +210,11 @@ def main():
         cursor.move(movementX, movementY)
         if (pygame.time.get_ticks() - lastAlien) > alienFrequency:
             # spawn new alien :)
-            aliens.add(Alien())
+            aliens.add(Alien(alienHp))
             lastAlien = pygame.time.get_ticks()
             alienSpeed *= alienSpeedFactor
             alienFrequency /= alienFrequencyFactor
+            alienHp *= alienHpFactor
 
         # check collisions
         # .. any alien hit?
@@ -216,7 +225,8 @@ def main():
 
         if targhit != None:
             screen.fill(RED)
-            targhit.kill(1.0)
+            targhit.kill(100.0)
+            life -= 1
         else:
             screen.fill(BLACK)
 
@@ -227,10 +237,35 @@ def main():
         towers.draw(screen)
         aliens.draw(screen)
         player.draw(screen)
+        
+        #draw money bar
+        if money > 0:
+            pygame.draw.aaline(screen, WHITE, (1, screen.get_rect().height - 2), (money + 1, screen.get_rect().height - 2),1)
+            
+        if life > 0:
+            pygame.draw.aaline(screen, WHITE, (1, 1), (life + 1, 1),1)
+        
 
         simDisplay.update(screen)
         ledDisplay.update(screen)
 
         clock.tick(30)
-
+        if life == 0:
+            break
+    
+    pygame.font.init()
+    font_text = pygame.font.SysFont(None, 15)
+    text_gameover = "GAME OVER"
+    write_gameover = font_text.render(text_gameover, True, WHITE)
+    
+    screen.blit(write_gameover, (14,5))
+    
+    simDisplay.update(screen)
+    ledDisplay.update(screen)
+    
+    while True:
+        event = pygame.event.wait()
+        if event.type == KEYDOWN:
+            break
+    
 main()
