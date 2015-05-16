@@ -9,7 +9,10 @@ WHITE = pygame.Color(255, 255, 255)
 GREEN = pygame.Color(0, 255, 0)
 YELLOW = pygame.Color(255, 255, 0)
 RED = pygame.Color(255, 0, 0)
-BLUE = pygame.Color(0,0,255)
+BLUE = pygame.Color(0, 0, 255)
+CYAN = pygame.Color(0, 255, 255)
+MAGENTA = pygame.Color(255, 0, 255)
+ORANGE = pygame.Color(255, 140, 0)
 
 # detect if a serial/USB port is given as argument
 hasSerialPortParameter = ( sys.argv.__len__() > 1 )
@@ -36,11 +39,13 @@ alienSpeed = 200
 alienHp = 10.0
 
 alienSpeedAdd = -5
-alienFrequencyFactor = 1.01
-alienHpFactor = 1.05
+alienFrequencyFactor = 1.03
+alienHpFactor = 1.04
 
 money = 6
 life = 3
+
+score = 0.0
 
 
 def expandRect(rect, px):
@@ -81,10 +86,21 @@ class Alien(pygame.sprite.Sprite, Animation):
         
         self.maxhp = hp
         self.hp = hp
+        
+        self.reduce_speed = False
+        
+        self.updates = 0 
 
         #self.rect.y = random.randint(0, screen.get_rect().height - self.rect.height)
 
     def update(self, *args):
+        
+        self.updates += 1
+        
+        if self.updates % 2 == 0 and self.reduce_speed:
+            return
+        
+        self.reduce_speed = False
         
         if self.rect.x <= 20 and self.rect.y == 9:
             _rect = self.linearMove(-1, 0)
@@ -105,12 +121,13 @@ class Alien(pygame.sprite.Sprite, Animation):
 
     def kill(self, damage = 3.34):
         
-        global money
+        global money, score
         self.hp -= damage
         
         if self.hp <= 0:
             super(Alien, self).kill()
             money += 1
+            score += self.maxhp
         else:
             percent = float(self.hp) / self.maxhp
             
@@ -134,6 +151,7 @@ class Tower(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.midleft = cursor.rect.midleft
         self.rect.x += 1
+        self.cost = 3
         
     def update(self, aliens):
         shootrange = expandRect(self.rect, 4);
@@ -143,15 +161,67 @@ class Tower(pygame.sprite.Sprite):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, BLUE, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5),1)
+                pygame.draw.aaline(screen, BLUE, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(.1)
                 break
+                
+class SlowTower(Tower):
+    def __init__(self, cursor):
+        Tower.__init__(self, cursor)
+        self.image.fill(ORANGE)
+        self.cost = 5
         
+    def update(self, aliens):
+        shootrange = expandRect(self.rect, 5);
+        t = pygame.sprite.Sprite()
+        t.rect = shootrange
+        
+        for alien in aliens:
+            targhit = pygame.sprite.collide_circle(t, alien)
+            if targhit:
+                pygame.draw.aaline(screen, ORANGE, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                alien.reduce_speed = True
+
+class StrongerTower(Tower):
+    def __init__(self, cursor):
+        Tower.__init__(self, cursor)
+        self.image.fill(CYAN)
+        self.cost = 5
+        
+    def update(self, aliens):
+        shootrange = expandRect(self.rect, 5);
+        t = pygame.sprite.Sprite()
+        t.rect = shootrange
+        
+        for alien in aliens:
+            targhit = pygame.sprite.collide_circle(t, alien)
+            if targhit:
+                pygame.draw.aaline(screen, CYAN, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                alien.kill(.3)
+                break
+
+class StrongestTower(Tower):
+    def __init__(self, cursor):
+        Tower.__init__(self, cursor)
+        self.image.fill(MAGENTA)
+        self.cost = 10
+        
+    def update(self, aliens):
+        shootrange = expandRect(self.rect, 6);
+        t = pygame.sprite.Sprite()
+        t.rect = shootrange
+        
+        for alien in aliens:
+            targhit = pygame.sprite.collide_circle(t, alien)
+            if targhit:
+                pygame.draw.aaline(screen, MAGENTA, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                alien.kill(.6)
+
 class Target(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((2, 2))
-        self.image.fill(pygame.Color(255,255,255))
+        self.image.fill(WHITE)
         self.rect = self.image.get_rect()
         self.rect.midleft = (14, 10)
 
@@ -170,10 +240,14 @@ def main():
     towers = pygame.sprite.Group()
     aliens = pygame.sprite.Group()
     
-
+    towersel = 0
+    
     movementX = 0
     movementY = 0
     lastAlien = 0
+    
+    # Set up background
+    bg = pygame.Surface(size).convert_alpha()
     
     path = pygame.sprite.Group()
     
@@ -183,9 +257,36 @@ def main():
             tile.update()
         path.add(tile)
         
-    bg = pygame.Surface(size).convert_alpha()
-    
     path.draw(bg)
+    
+    menu = pygame.sprite.Group()
+    towcurs = Cursor()
+    
+    towcurs.move(-2, 5)
+    
+    t = Tower(towcurs)
+    menu.add(t)
+    
+    towcurs.move(3, 0)
+    
+    t = StrongerTower(towcurs)
+    menu.add(t)
+    
+    towcurs.move(3, 0)
+    
+    t = SlowTower(towcurs)
+    menu.add(t)
+    
+    towcurs.move(3, 0)
+    
+    t = StrongestTower(towcurs)
+    menu.add(t)
+    
+    towcurs.move(-9, 0)
+    
+    menu.draw(bg)
+    
+    player.add(towcurs)
 
     while True:
         for event in pygame.event.get():
@@ -198,13 +299,42 @@ def main():
                     movementY = -1
                 elif event.key == K_DOWN:
                     movementY = 1
+                    
                 if event.key == K_RIGHT:
                     movementX = 1
                 elif event.key == K_LEFT:
                     movementX = -1
-                elif event.key == K_SPACE and money >= 3:
-                    towers.add(Tower(cursor))
-                    money -= 3
+                elif event.key == K_w:
+                    towersel += 1
+                    towcurs.move(3, 0)
+                    
+                    if towersel > 3:
+                        towersel = 0
+                        towcurs.move(-12, 0)
+                elif event.key == K_SPACE:
+                    if towersel == 0:
+                        tower = Tower(cursor)
+                    elif towersel == 1:
+                        tower = StrongerTower(cursor)
+                    elif towersel == 2:
+                        tower = SlowTower(cursor)
+                    elif towersel == 3:
+                        tower = StrongestTower(cursor)
+                    
+                    if money >= tower.cost:
+                        for t in towers:
+                            if pygame.sprite.collide_rect(t, tower):
+                                t.kill()
+                        
+                        place = True        
+                        
+                        for p in path:
+                            if pygame.sprite.collide_rect(tower, p):
+                                place = False
+                        
+                        if place:
+                            towers.add(tower)
+                            money -= tower.cost
 
             elif event.type == KEYUP:
                 if event.key == K_UP or event.key == K_DOWN:
@@ -213,13 +343,20 @@ def main():
                     movementX = 0
 
         cursor.move(movementX, movementY)
+        
+        # increase difficulty
         if (pygame.time.get_ticks() - lastAlien) > alienFrequency:
             # spawn new alien :)
             aliens.add(Alien(alienHp))
             lastAlien = pygame.time.get_ticks()
-            alienSpeed += alienSpeedAdd
-            alienFrequency /= alienFrequencyFactor
             alienHp *= alienHpFactor
+            
+            if alienSpeed > 60:
+                alienSpeed += alienSpeedAdd
+            
+            if alienFrequency > 1250:
+                alienFrequency /= alienFrequencyFactor
+            print("Spawned Alien... HP: %6f Speed: %3i Freq: %6f" % (alienHp, alienSpeed, alienFrequency))
 
         # check collisions
         # .. any alien hit?
@@ -238,8 +375,10 @@ def main():
         screen.blit(bg, (0,0))
         
         player.update()
+        
         if pygame.time.get_ticks() % alienSpeed <= 30:
             aliens.update()
+            
         towers.update(aliens)
         
         towers.draw(screen)
