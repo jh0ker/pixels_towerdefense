@@ -13,6 +13,7 @@ BLUE = pygame.Color(0, 0, 255)
 CYAN = pygame.Color(0, 255, 255)
 MAGENTA = pygame.Color(255, 0, 255)
 ORANGE = pygame.Color(255, 140, 0)
+LOBBY = pygame.Color(48, 144, 96)
 
 # detect if a serial/USB port is given as argument
 hasSerialPortParameter = ( sys.argv.__len__() > 1 )
@@ -97,8 +98,8 @@ class Alien(pygame.sprite.Sprite, Animation):
         
         self.updates += 1
         
-        if self.reduce_speed > 3:
-            self.reduce_speed = 3
+        if self.reduce_speed > 2:
+            self.reduce_speed = 2
         
         slow_factor = 1 if self.reduce_speed == 0 else 2 * self.reduce_speed
         if self.updates % slow_factor != 0:
@@ -314,9 +315,25 @@ def main():
     menu.draw(bg)
     
     player.add(towcurs)
-
+    
+    gameover = 0
+    
+    screen.fill(BLACK)
+    text_lobby = "Towerdefense!"
+    write_gameover = font_text.render(text_gameover, True, LOBBY)
+    
+    screen.blit(write_gameover, (2,4))
+    
+    simDisplay.update(screen)
+    ledDisplay.update(screen)
+    
     while True:
+        event = pygame.event.wait()
+        if event.type == KEYDOWN or event.type == JOYBUTTONDOWN:
+            break
 
+    while gameover < 2:
+        gameover = 0
         for event in pygame.event.get():
             try:
                 if event.type == QUIT:
@@ -364,6 +381,11 @@ def main():
                             if place:
                                 towers.add(tower)
                                 money -= tower.cost
+                                
+                    elif event.type == JOYBUTTONDOWN and event.button == 7:
+                        gameover += 1
+                    elif event.type == JOYBUTTONDOWN and event.button == 8:
+                        gameover += 1
 
                 elif event.type == KEYUP or event.type == JOYAXISMOTION and event.value == 0.0:
                     if event.type == KEYUP and (event.key == K_UP or event.key == K_DOWN) or event.type == JOYAXISMOTION and event.axis == 1:
@@ -432,7 +454,7 @@ def main():
 
         clock.tick(30)
         if life == 0:
-            break
+            gameover = 2
     
     pygame.font.init()
     font_text = pygame.font.SysFont(None, 18)
@@ -446,7 +468,8 @@ def main():
     
     while True:
         event = pygame.event.wait()
-        break
+        if event.type == KEYDOWN or event.type == JOYBUTTONDOWN:
+            break
             
     screen.fill(BLACK)
     text_gameover = "Score: " + str(int(score))
@@ -459,7 +482,8 @@ def main():
     
     while True:
         event = pygame.event.wait()
-        break
+        if event.type == KEYDOWN or event.type == JOYBUTTONDOWN:
+            break
     
     main()
     
