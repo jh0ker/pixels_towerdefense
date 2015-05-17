@@ -3,7 +3,7 @@ A towerdefense game for the arduino pixels videogame, created during the Videoga
 It's based on the shooter example from https://github.com/michaelkoetter/pygame-ledpixels
 
 ### Objective
-Kill Enemies to get Money. Your Money is displayed at the lower left corner, your Lifepoints are displayed at the upper left corner. Each time an Alien (the green squares) gets to your Base (the white square at the end of the track), you loose one Lifepoint. Aliens get stronger, faster and spawn more frequently over time, so be sure to build Towers! If you place a Tower on top of others, the Tower(s) below will be destroyed.  
+Kill Aliens to get Money. Your Money is displayed at the lower left corner, your Lifepoints are displayed at the upper left corner. Each time an Alien (the green squares) gets to your Base (the white square at the end of the track), you loose one Lifepoint. Aliens get stronger, faster and spawn more frequently over time, so be sure to build Towers! If you place a Tower on top of others, the Tower(s) below will be destroyed.  
 
 ### Controls
 * Arrow keys or Joystick to move the cursor
