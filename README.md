@@ -7,5 +7,5 @@ Use the arrow keys to move the cursor and press W to select a tower. Kill Enemie
 Towers:
 * Blue: 3 Money, weakest 
 * Cyan: 6 Money, stronger
-* Orange: 5 Money, no damage, slows by 50% (stacks)
+* Orange: 5 Money, no damage, slows by 50% (stacks), shoots at multiple targets at once
 * Magenta: 14 Money, strongest, shoots up to three targets at once
