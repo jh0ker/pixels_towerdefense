@@ -156,7 +156,7 @@ class Tower(pygame.sprite.Sprite):
         self.cost = 3
         
     def update(self, aliens):
-        shootrange = expandRect(self.rect, 4);
+        shootrange = expandRect(self.rect, 8);
         t = pygame.sprite.Sprite()
         t.rect = shootrange
         
@@ -165,7 +165,6 @@ class Tower(pygame.sprite.Sprite):
             if targhit:
                 pygame.draw.aaline(screen, BLUE, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(.1)
-                break
                 
 class SlowTower(Tower):
     def __init__(self, cursor):
