@@ -34,13 +34,13 @@ simDisplay = led.sim.SimDisplay(size)
 screen = pygame.Surface(size)
 
 # every time an alien spawns...
-alienFrequency = 4000
+alienFrequency = 5000
 alienSpeed = 200
 alienHp = 10.0
 
 alienSpeedAdd = -5
 alienFrequencyFactor = 1.03
-alienHpFactor = 1.04
+alienHpFactor = 1.03
 
 money = 6
 life = 3
@@ -87,7 +87,7 @@ class Alien(pygame.sprite.Sprite, Animation):
         self.maxhp = hp
         self.hp = hp
         
-        self.reduce_speed = False
+        self.reduce_speed = 0
         
         self.updates = 0 
 
@@ -97,10 +97,12 @@ class Alien(pygame.sprite.Sprite, Animation):
         
         self.updates += 1
         
-        if self.updates % 2 == 0 and self.reduce_speed:
+        slow_factor = 1 if self.reduce_speed == 0 else 2 * self.reduce_speed
+        if self.updates % slow_factor != 0:
+            self.reduce_speed = 0
             return
         
-        self.reduce_speed = False
+        self.reduce_speed = 0
         
         if self.rect.x <= 20 and self.rect.y == 9:
             _rect = self.linearMove(-1, 0)
@@ -180,13 +182,13 @@ class SlowTower(Tower):
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
                 pygame.draw.aaline(screen, ORANGE, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
-                alien.reduce_speed = True
+                alien.reduce_speed += 1
 
 class StrongerTower(Tower):
     def __init__(self, cursor):
         Tower.__init__(self, cursor)
         self.image.fill(CYAN)
-        self.cost = 5
+        self.cost = 6
         
     def update(self, aliens):
         shootrange = expandRect(self.rect, 5);
@@ -204,18 +206,22 @@ class StrongestTower(Tower):
     def __init__(self, cursor):
         Tower.__init__(self, cursor)
         self.image.fill(MAGENTA)
-        self.cost = 10
+        self.cost = 14
         
     def update(self, aliens):
         shootrange = expandRect(self.rect, 6);
         t = pygame.sprite.Sprite()
         t.rect = shootrange
         
+        hits = 0
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
                 pygame.draw.aaline(screen, MAGENTA, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
-                alien.kill(.6)
+                alien.kill(.7)
+                hits += 1
+                if hits == 3:
+                    break
 
 class Target(pygame.sprite.Sprite):
     def __init__(self):
@@ -238,7 +244,7 @@ def main():
     player.add(target)
 
     towers = pygame.sprite.Group()
-    aliens = pygame.sprite.Group()
+    aliens = pygame.sprite.OrderedUpdates()
     
     towersel = 0
     
@@ -247,7 +253,9 @@ def main():
     lastAlien = 0
     
     # Set up background
-    bg = pygame.Surface(size).convert_alpha()
+    bg = pygame.Surface(size)
+    bg.fill(BLACK)
+    bg.set_colorkey(BLACK)
     
     path = pygame.sprite.Group()
     
@@ -358,10 +366,6 @@ def main():
                 alienFrequency /= alienFrequencyFactor
             print("Spawned Alien... HP: %6f Speed: %3i Freq: %6f" % (alienHp, alienSpeed, alienFrequency))
 
-        # check collisions
-        # .. any alien hit?
-        pygame.sprite.groupcollide(towers, aliens, True, True)
-
         # .. player hit?
         targhit = pygame.sprite.spritecollideany(target, aliens)
 
@@ -378,7 +382,10 @@ def main():
         
         if pygame.time.get_ticks() % alienSpeed <= 30:
             aliens.update()
-            
+        else:
+            for alien in aliens:
+                alien.reduce_speed = 0
+        
         towers.update(aliens)
         
         towers.draw(screen)
@@ -400,11 +407,25 @@ def main():
             break
     
     pygame.font.init()
-    font_text = pygame.font.SysFont(None, 15)
+    font_text = pygame.font.SysFont(None, 18)
     text_gameover = "GAME OVER"
     write_gameover = font_text.render(text_gameover, True, WHITE)
     
-    screen.blit(write_gameover, (14,5))
+    screen.blit(write_gameover, (10,4))
+    
+    simDisplay.update(screen)
+    ledDisplay.update(screen)
+    
+    while True:
+        event = pygame.event.wait()
+        if event.type == KEYDOWN:
+            break
+            
+    screen.fill(BLACK)
+    text_gameover = "Score: " + str(int(score))
+    write_gameover = font_text.render(text_gameover, True, WHITE)
+    
+    screen.blit(write_gameover, (2,4))
     
     simDisplay.update(screen)
     ledDisplay.update(screen)
