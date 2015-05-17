@@ -36,11 +36,11 @@ screen = pygame.Surface(size)
 # every time an alien spawns...
 alienFrequency = 5000
 alienSpeed = 200
-alienHp = 10.0
+alienHp = 30.0
 
 alienSpeedAdd = -5
 alienFrequencyFactor = 1.03
-alienHpFactor = 1.03
+alienHpFactor = 1.1
 
 money = 6
 life = 3
@@ -164,7 +164,7 @@ class Tower(pygame.sprite.Sprite):
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
                 pygame.draw.aaline(screen, BLUE, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
-                alien.kill(.1)
+                alien.kill(.15)
                 
 class SlowTower(Tower):
     def __init__(self, cursor):
@@ -187,7 +187,7 @@ class StrongerTower(Tower):
     def __init__(self, cursor):
         Tower.__init__(self, cursor)
         self.image.fill(CYAN)
-        self.cost = 6
+        self.cost = 10
         
     def update(self, aliens):
         shootrange = expandRect(self.rect, 5);
@@ -198,17 +198,17 @@ class StrongerTower(Tower):
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
                 pygame.draw.aaline(screen, CYAN, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
-                alien.kill(.3)
+                alien.kill(.8)
                 break
 
 class StrongestTower(Tower):
     def __init__(self, cursor):
         Tower.__init__(self, cursor)
         self.image.fill(MAGENTA)
-        self.cost = 14
+        self.cost = 20
         
     def update(self, aliens):
-        shootrange = expandRect(self.rect, 6);
+        shootrange = expandRect(self.rect, 7);
         t = pygame.sprite.Sprite()
         t.rect = shootrange
         
@@ -217,10 +217,9 @@ class StrongestTower(Tower):
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
                 pygame.draw.aaline(screen, MAGENTA, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
-                alien.kill(.7)
-                hits += 1
-                if hits == 3:
-                    break
+                alien.kill(1.8)
+                break
+                #hits += 1
 
 class Target(pygame.sprite.Sprite):
     def __init__(self):
@@ -231,9 +230,16 @@ class Target(pygame.sprite.Sprite):
         self.rect.midleft = (14, 10)
 
 def main():
-    global alienSpeed, alienFrequency, alienHp, money, life
+    global alienSpeed, alienFrequency, alienHp, alienHpFactor, money, life
 
     clock = pygame.time.Clock()
+    pygame.joystick.init()
+    
+    if pygame.joystick.get_count() > 0:
+        stick = pygame.joystick.Joystick(0)
+        stick.init()
+    else:
+        stick = None
 
     cursor = Cursor()
     target = Target()
@@ -276,12 +282,12 @@ def main():
     
     towcurs.move(3, 0)
     
-    t = StrongerTower(towcurs)
+    t = SlowTower(towcurs)
     menu.add(t)
     
     towcurs.move(3, 0)
     
-    t = SlowTower(towcurs)
+    t = StrongerTower(towcurs)
     menu.add(t)
     
     towcurs.move(3, 0)
@@ -296,59 +302,66 @@ def main():
     player.add(towcurs)
 
     while True:
+
         for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
+            print(str(event))
+            try:
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-            elif event.type == KEYDOWN:
-                if event.key == K_UP:
-                    movementY = -1
-                elif event.key == K_DOWN:
-                    movementY = 1
-                    
-                if event.key == K_RIGHT:
-                    movementX = 1
-                elif event.key == K_LEFT:
-                    movementX = -1
-                elif event.key == K_w:
-                    towersel += 1
-                    towcurs.move(3, 0)
-                    
-                    if towersel > 3:
-                        towersel = 0
-                        towcurs.move(-12, 0)
-                elif event.key == K_SPACE:
-                    if towersel == 0:
-                        tower = Tower(cursor)
-                    elif towersel == 1:
-                        tower = StrongerTower(cursor)
-                    elif towersel == 2:
-                        tower = SlowTower(cursor)
-                    elif towersel == 3:
-                        tower = StrongestTower(cursor)
-                    
-                    if money >= tower.cost:
-                        for t in towers:
-                            if pygame.sprite.collide_rect(t, tower):
-                                t.kill()
+                elif event.type == KEYDOWN or event.type == JOYAXISMOTION and event.value != 0 or event.type == JOYBUTTONDOWN:
+                
+                    if event.type == KEYDOWN and event.key == K_UP or event.type == JOYAXISMOTION and event.axis == 1 and event.value < 0:
+                        movementY = -1
+                    elif event.type == KEYDOWN and event.key == K_DOWN or event.type == JOYAXISMOTION and event.axis == 1 and event.value > 0:
+                        movementY = 1
+                    elif event.type == KEYDOWN and event.key == K_RIGHT or event.type == JOYAXISMOTION and event.axis == 0 and event.value > 0:
+                        movementX = 1
+                    elif event.type == KEYDOWN and event.key == K_LEFT or event.type == JOYAXISMOTION and event.axis == 0 and event.value < 0:
+                        movementX = -1
                         
-                        place = True        
+                    elif event.type == KEYDOWN and event.key == K_w or event.type == JOYBUTTONDOWN and event.button == 0:
+                        towersel += 1
+                        towcurs.move(3, 0)
                         
-                        for p in path:
-                            if pygame.sprite.collide_rect(tower, p):
-                                place = False
+                        if towersel > 3:
+                            towersel = 0
+                            towcurs.move(-12, 0)
+                    elif event.type == KEYDOWN and event.key == K_SPACE or event.type == JOYBUTTONDOWN and event.button == 1:
+                        if towersel == 0:
+                            tower = Tower(cursor)
+                        elif towersel == 1:
+                            tower = SlowTower(cursor)
+                        elif towersel == 2:
+                            tower = StrongerTower(cursor)
+                        elif towersel == 3:
+                            tower = StrongestTower(cursor)
                         
-                        if place:
-                            towers.add(tower)
-                            money -= tower.cost
+                        if money >= tower.cost:
+                            for t in towers:
+                                if pygame.sprite.collide_rect(t, tower):
+                                    t.kill()
+                            
+                            place = True        
+                            
+                            for p in path:
+                                if pygame.sprite.collide_rect(tower, p):
+                                    place = False
+                            
+                            if place:
+                                towers.add(tower)
+                                money -= tower.cost
 
-            elif event.type == KEYUP:
-                if event.key == K_UP or event.key == K_DOWN:
-                    movementY = 0
-                elif event.key == K_RIGHT or event.key == K_LEFT:
-                    movementX = 0
-
+                elif event.type == KEYUP or event.type == JOYAXISMOTION and event.value == 0:
+                    if event.type == KEYUP and event.key == K_UP or event.key == K_DOWN or event.type == JOYAXISMOTION and event.axis == 1:
+                        movementY = 0
+                    elif event.type == KEYUP and event.key == K_RIGHT or event.key == K_LEFT or event.type == JOYAXISMOTION and event.axis == 0:
+                        movementX = 0
+                
+            except AttributeError:
+                print("AttributeError on " + str(event))
+                
         cursor.move(movementX, movementY)
         
         # increase difficulty
@@ -363,6 +376,10 @@ def main():
             
             if alienFrequency > 1250:
                 alienFrequency /= alienFrequencyFactor
+                
+            if alienHpFactor > 1.01:
+                alienHpFactor -= 0.002
+                
             print("Spawned Alien... HP: %6f Speed: %3i Freq: %6f" % (alienHp, alienSpeed, alienFrequency))
 
         # .. player hit?
