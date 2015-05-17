@@ -169,7 +169,7 @@ class Tower(pygame.sprite.Sprite):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                pygame.draw.line(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(.15)
                 
 class SlowTower(Tower):
@@ -186,7 +186,7 @@ class SlowTower(Tower):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                pygame.draw.line(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.reduce_speed += 1
 
 class StrongerTower(Tower):
@@ -203,7 +203,7 @@ class StrongerTower(Tower):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                pygame.draw.line(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(.8)
                 break
 
@@ -222,7 +222,7 @@ class StrongestTower(Tower):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                pygame.draw.line(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(1.8)
                 break
                 #hits += 1
@@ -293,33 +293,27 @@ def main():
     towcurs = Cursor()
     
     towcurs.move(-2, 5)
-    
-    t = Tower(towcurs)
-    menu.add(t)
-    
-    towcurs.move(3, 0)
-    
-    t = SlowTower(towcurs)
-    menu.add(t)
+    menu.add(Tower(towcurs))
+    bg.set_at((3, 18), BLUE)
     
     towcurs.move(3, 0)
-    
-    t = StrongerTower(towcurs)
-    menu.add(t)
+    menu.add(SlowTower(towcurs))
+    bg.set_at((5, 18), ORANGE)
     
     towcurs.move(3, 0)
+    menu.add(StrongerTower(towcurs))
+    bg.set_at((10, 18), CYAN)
     
-    t = StrongestTower(towcurs)
-    menu.add(t)
-    
-    towcurs.move(-9, 0)
+    towcurs.move(3, 0)
+    menu.add(StrongestTower(towcurs))
+    bg.set_at((20, 18), MAGENTA)
     
     menu.draw(bg)
     
+    towcurs.move(-9, 0)
     player.add(towcurs)
     
     gameover = 0
-    
     
     pygame.font.init()
     font_text = pygame.font.SysFont(None, 18)
@@ -450,10 +444,10 @@ def main():
         
         #draw money bar
         if money > 0:
-            pygame.draw.aaline(screen, WHITE, (1, screen.get_rect().height - 2), (money + 1, screen.get_rect().height - 2),1)
+            pygame.draw.line(screen, WHITE, (1, screen.get_rect().height - 2), (money, screen.get_rect().height - 2), 1)
             
         if life > 0:
-            pygame.draw.aaline(screen, WHITE, (1, 1), (life + 1, 1),1)
+            pygame.draw.line(screen, WHITE, (1, 1), (life, 1), 1)
         
         simDisplay.update(screen)
         ledDisplay.update(screen)
