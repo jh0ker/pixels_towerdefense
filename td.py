@@ -15,6 +15,8 @@ MAGENTA = pygame.Color(255, 0, 255)
 ORANGE = pygame.Color(255, 140, 0)
 LOBBY = pygame.Color(48, 144, 96)
 
+SHOOT = pygame.Color(50, 0, 0)
+
 # detect if a serial/USB port is given as argument
 hasSerialPortParameter = ( sys.argv.__len__() > 1 )
 
@@ -167,7 +169,7 @@ class Tower(pygame.sprite.Sprite):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, BLUE, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                pygame.draw.aaline(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(.15)
                 
 class SlowTower(Tower):
@@ -184,7 +186,7 @@ class SlowTower(Tower):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, ORANGE, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                pygame.draw.aaline(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.reduce_speed += 1
 
 class StrongerTower(Tower):
@@ -201,7 +203,7 @@ class StrongerTower(Tower):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, CYAN, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                pygame.draw.aaline(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(.8)
                 break
 
@@ -220,7 +222,7 @@ class StrongestTower(Tower):
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
-                pygame.draw.aaline(screen, MAGENTA, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
+                pygame.draw.aaline(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(1.8)
                 break
                 #hits += 1
