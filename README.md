@@ -2,10 +2,18 @@
 A towerdefense game for the arduino pixels videogame, created during the Videogame Hackathon at Hackerspace Bremen.
 It's based on the shooter example from https://github.com/michaelkoetter/pygame-ledpixels
 
-Use the arrow keys to move the cursor and press W to select a tower. Kill Enemies to get Money. Your Money is displayed at the lower left corner, your Lifepoints are displayed at the upper left corner. Each time an Enemy gets to the white square at the end of the track, you loose one Lifepoint. Enemies get stronger, faster and spawn more frequently over time, so be sure to upgrade! If you place a Tower on top of another one, the tower(s) below will be destroyed.  
+### Objective
+Kill Enemies to get Money. Your Money is displayed at the lower left corner, your Lifepoints are displayed at the upper left corner. Each time an Alien (the green squares) gets to your Base (the white square at the end of the track), you loose one Lifepoint. Aliens get stronger, faster and spawn more frequently over time, so be sure to build Towers! If you place a Tower on top of others, the Tower(s) below will be destroyed.  
 
-Towers:
-* Blue: 3 Money, weakest, highest range, shoots multiple targest at once
-* Cyan: 6 Money, stronger
-* Orange: 5 Money, no damage, slows by 50% (stacks), shoots at multiple targets at once
-* Magenta: 14 Money, strongest, shoots up to three targets at once
+### Controls
+* Arrow keys or Joystick to move the cursor
+* Space or Button 1 on the controller to place a Tower
+* W or Button 2 on the controller to select a Tower
+
+### Towers
+* Blue: 3 Money, weak, high-range, multiple targets
+* Orange: 5 Money, no damage, low-range, slows by 50% (stacks once to 25%), multiple targets
+* Cyan: 10 Money, stronger, low-range, single target
+* Magenta: 20 Money, strongest, mid-range, single target
+
+There are little colored dots on the Money-meter which mark the amount of Money you need to buy the respective Tower.
