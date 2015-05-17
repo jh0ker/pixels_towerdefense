@@ -230,7 +230,7 @@ class Target(pygame.sprite.Sprite):
         self.rect.midleft = (14, 10)
 
 def main():
-    global alienSpeed, alienFrequency, alienHp, alienHpFactor, money, life
+    global alienSpeed, alienFrequency, alienHp, alienHpFactor, money, life, score
 
     clock = pygame.time.Clock()
     pygame.joystick.init()
@@ -263,7 +263,7 @@ def main():
     
     alienFrequency = 5000.0
     alienSpeed = 200
-    alienHp = 30.0
+    alienHp = 25.0
     alienHpFactor = 1.1
     
     score = 0.0
@@ -387,7 +387,7 @@ def main():
                 alienFrequency /= alienFrequencyFactor
                 
             if alienHpFactor > 1.01:
-                alienHpFactor -= 0.002
+                alienHpFactor -= 0.0025
                 
             print("Spawned Alien... HP: %6f Speed: %3i Freq: %6f" % (alienHp, alienSpeed, alienFrequency))
 
