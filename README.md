@@ -9,6 +9,7 @@ Kill Enemies to get Money. Your Money is displayed at the lower left corner, you
 * Arrow keys or Joystick to move the cursor
 * Space or Button 1 on the controller to place a Tower
 * W or Button 2 on the controller to select a Tower
+* Press both the Player 1 and Player 2 buttons on the controller to end the game immediately
 
 ### Towers
 * Blue: 3 Money, weak, high-range, multiple targets
