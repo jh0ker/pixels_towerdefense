@@ -415,8 +415,8 @@ def main():
             if alienFrequency > 1750:
                 alienFrequency /= alienFrequencyFactor
                 
-            if alienHpFactor > 1.005:
-                alienHpFactor -= 0.00275
+            if alienHpFactor > 1.01:
+                alienHpFactor -= 0.0025
                 
             print("Spawned Alien... HP: %6f Speed: %3i Freq: %6f" % (alienHp, alienSpeed, alienFrequency))
 
