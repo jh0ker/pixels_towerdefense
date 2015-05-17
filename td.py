@@ -317,7 +317,7 @@ def main():
         for event in pygame.event.get():
             try:
                 if event.type == JOYBUTTONDOWN:
-                    print("ButtonDownEvent: " + str(event)
+                    print("ButtonDownEvent: " + str(event))
                     
                 if event.type == QUIT:
                     pygame.quit()
