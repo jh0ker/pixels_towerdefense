@@ -323,7 +323,7 @@ def main():
     font_text = pygame.font.SysFont(None, 18)
     
     text_lobby = "Towerdefense!"
-    write_gameover = font_text.render(text_lobby, True, LOBBY)
+    write_lobby = font_text.render(text_lobby, True, LOBBY)
     
     screen.fill(BLACK)
     screen.blit(write_lobby, (2,4))
