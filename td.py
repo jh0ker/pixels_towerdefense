@@ -304,14 +304,12 @@ def main():
     while True:
 
         for event in pygame.event.get():
-            print(str(event))
             try:
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
 
                 elif event.type == KEYDOWN or event.type == JOYAXISMOTION and event.value != 0 or event.type == JOYBUTTONDOWN:
-                
                     if event.type == KEYDOWN and event.key == K_UP or event.type == JOYAXISMOTION and event.axis == 1 and event.value < 0:
                         movementY = -1
                     elif event.type == KEYDOWN and event.key == K_DOWN or event.type == JOYAXISMOTION and event.axis == 1 and event.value > 0:
@@ -353,10 +351,10 @@ def main():
                                 towers.add(tower)
                                 money -= tower.cost
 
-                elif event.type == KEYUP or event.type == JOYAXISMOTION and event.value == 0:
-                    if event.type == KEYUP and event.key == K_UP or event.key == K_DOWN or event.type == JOYAXISMOTION and event.axis == 1:
+                elif event.type == KEYUP or event.type == JOYAXISMOTION and event.value == 0.0:
+                    if event.type == KEYUP and (event.key == K_UP or event.key == K_DOWN) or event.type == JOYAXISMOTION and event.axis == 1:
                         movementY = 0
-                    elif event.type == KEYUP and event.key == K_RIGHT or event.key == K_LEFT or event.type == JOYAXISMOTION and event.axis == 0:
+                    elif event.type == KEYUP and (event.key == K_RIGHT or event.key == K_LEFT) or event.type == JOYAXISMOTION and event.axis == 0:
                         movementX = 0
                 
             except AttributeError:
@@ -434,8 +432,7 @@ def main():
     
     while True:
         event = pygame.event.wait()
-        if event.type == KEYDOWN:
-            break
+        break
             
     screen.fill(BLACK)
     text_gameover = "Score: " + str(int(score))
@@ -448,7 +445,8 @@ def main():
     
     while True:
         event = pygame.event.wait()
-        if event.type == KEYDOWN:
-            break
+        break
+    
+    main()
     
 main()
