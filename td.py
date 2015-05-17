@@ -257,6 +257,17 @@ def main():
     movementY = 0
     lastAlien = 0
     
+    #reset game
+    money = 6
+    life = 3
+    
+    alienFrequency = 5000.0
+    alienSpeed = 200
+    alienHp = 30.0
+    alienHpFactor = 1.1
+    
+    score = 0.0
+    
     # Set up background
     bg = pygame.Surface(size)
     bg.fill(BLACK)
@@ -305,6 +316,9 @@ def main():
 
         for event in pygame.event.get():
             try:
+                if event.type == JOYBUTTONDOWN:
+                    print("ButtonDownEvent: " + str(event)
+                    
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
