@@ -316,9 +316,6 @@ def main():
 
         for event in pygame.event.get():
             try:
-                if event.type == JOYBUTTONDOWN:
-                    print("ButtonDownEvent: " + str(event))
-                    
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
@@ -333,7 +330,7 @@ def main():
                     elif event.type == KEYDOWN and event.key == K_LEFT or event.type == JOYAXISMOTION and event.axis == 0 and event.value < 0:
                         movementX = -1
                         
-                    elif event.type == KEYDOWN and event.key == K_w or event.type == JOYBUTTONDOWN and event.button == 0:
+                    elif event.type == KEYDOWN and event.key == K_w or event.type == JOYBUTTONDOWN and event.button == 2:
                         towersel += 1
                         towcurs.move(3, 0)
                         
