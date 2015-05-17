@@ -318,11 +318,15 @@ def main():
     
     gameover = 0
     
-    screen.fill(BLACK)
-    text_lobby = "Towerdefense!"
-    write_gameover = font_text.render(text_gameover, True, LOBBY)
     
-    screen.blit(write_gameover, (2,4))
+    pygame.font.init()
+    font_text = pygame.font.SysFont(None, 18)
+    
+    text_lobby = "Towerdefense!"
+    write_gameover = font_text.render(text_lobby, True, LOBBY)
+    
+    screen.fill(BLACK)
+    screen.blit(write_lobby, (2,4))
     
     simDisplay.update(screen)
     ledDisplay.update(screen)
@@ -456,8 +460,6 @@ def main():
         if life == 0:
             gameover = 2
     
-    pygame.font.init()
-    font_text = pygame.font.SysFont(None, 18)
     text_gameover = "GAME OVER"
     write_gameover = font_text.render(text_gameover, True, WHITE)
     
