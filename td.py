@@ -97,6 +97,9 @@ class Alien(pygame.sprite.Sprite, Animation):
         
         self.updates += 1
         
+        if self.reduce_speed > 3:
+            self.reduce_speed = 3
+        
         slow_factor = 1 if self.reduce_speed == 0 else 2 * self.reduce_speed
         if self.updates % slow_factor != 0:
             self.reduce_speed = 0
@@ -387,7 +390,7 @@ def main():
                 alienFrequency /= alienFrequencyFactor
                 
             if alienHpFactor > 1.01:
-                alienHpFactor -= 0.0025
+                alienHpFactor -= 0.00275
                 
             print("Spawned Alien... HP: %6f Speed: %3i Freq: %6f" % (alienHp, alienSpeed, alienFrequency))
 
