@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import pygame, led, sys, os
 from pygame.locals import *
 
@@ -402,11 +404,13 @@ def main():
                                 towers.add(tower)
                                 money -= tower.cost
                                 
-                    # If both player buttons on the controller are pressed, end the game
+                    # If both player buttons on the controller or ESC on the keyboard are pressed, end the game
                     elif event.type == JOYBUTTONDOWN and event.button == 7:
                         gameover += 1
                     elif event.type == JOYBUTTONDOWN and event.button == 8:
                         gameover += 1
+                    elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                        gameover = 2
 
                 # Stop cursor movement in case of keyup or axis move to home position
                 elif event.type == KEYUP or event.type == JOYAXISMOTION and event.value == 0.0:
@@ -524,6 +528,6 @@ def main():
         if event.type == KEYDOWN or event.type == JOYBUTTONDOWN:
             break
     # Restart game
-    main()
+    # main()
     
 main()
