@@ -13,7 +13,7 @@ Kill Aliens to get Money. Your Money is displayed at the lower left corner, your
 
 ### Towers
 * Blue: 3 Money, weak, high-range, multiple targets
-* Orange: 5 Money, no damage, low-range, slows by 50% (stacks once to 25%), multiple targets
+* Orange: 5 Money, no damage, low-range, slows by 50% (stacks once to 75%), multiple targets
 * Cyan: 10 Money, stronger, low-range, single target
 * Magenta: 20 Money, strongest, mid-range, single target
 
