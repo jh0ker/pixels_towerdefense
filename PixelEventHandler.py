@@ -143,4 +143,3 @@ def process_event(event):
         print("AttributeError on " + str(event))
         return PixelEvent(UNKNOWN, -1, -1)
 
-    return PixelEvent(UNKNOWN, -1, -1)

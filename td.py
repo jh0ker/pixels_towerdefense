@@ -133,10 +133,8 @@ def main():
     pygame.event.clear()
 
     while True:
-        pgevent = pygame.event.wait()
-        event = process_event(pgevent)
+        event = process_event(pygame.event.wait())
         if event.type == PUSH:
-            print(str(pgevent))
             break
 
     while gameover < 2:
@@ -295,8 +293,8 @@ def main():
     
     # Wait for keypress
     while True:
-        event = pygame.event.wait()
-        if event.type == KEYDOWN or event.type == JOYBUTTONDOWN:
+        event = process_event(pygame.event.wait())
+        if event.type == PUSH:
             break
             
     # Show score
@@ -311,8 +309,8 @@ def main():
     
     # Wait for keypress
     while True:
-        event = pygame.event.wait()
-        if event.type == KEYDOWN or event.type == JOYBUTTONDOWN:
+        event = process_event(pygame.event.wait())
+        if event.type == PUSH:
             break
     # Restart game
     # main()
