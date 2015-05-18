@@ -6,9 +6,9 @@ import sys
 from Alien import Alien, Path
 from Towers import Tower, SlowTower, StrongerTower, StrongestTower
 from Colors import *
-from pygame.locals import *
 from Cursor import Cursor
 from Target import Target
+from PixelEventHandler import *
 import Gamedata
 
 """ https://github.com/jh0ker/pixels_towerdefense
@@ -95,19 +95,19 @@ def main():
     
     towcurs.move(-2, 5)
     menu.add(Tower(towcurs))
-    bg.set_at((3, 18), BLUE)
+    bg.set_at((3, 19), BLUE)
     
     towcurs.move(3, 0)
     menu.add(SlowTower(towcurs))
-    bg.set_at((5, 18), ORANGE)
+    bg.set_at((5, 19), ORANGE)
     
     towcurs.move(3, 0)
     menu.add(StrongerTower(towcurs))
-    bg.set_at((10, 18), CYAN)
+    bg.set_at((10, 19), CYAN)
     
     towcurs.move(3, 0)
     menu.add(StrongestTower(towcurs))
-    bg.set_at((20, 18), MAGENTA)
+    bg.set_at((20, 19), MAGENTA)
     
     menu.draw(bg)
     
@@ -129,87 +129,87 @@ def main():
     
     simDisplay.update(screen)
     ledDisplay.update(screen)
-    
+
+    pygame.event.clear()
+
     while True:
-        event = pygame.event.wait()
-        if event.type == KEYDOWN or event.type == JOYBUTTONDOWN:
+        pgevent = pygame.event.wait()
+        event = process_event(pgevent)
+        if event.type == PUSH:
+            print(str(pgevent))
             break
 
     while gameover < 2:
         gameover = 0
         
         # Process event queue
-        for event in pygame.event.get():
-            try:
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                
-                # Keypresses on keyboard and joystick axis motions / button presses
-                elif event.type == KEYDOWN or event.type == JOYAXISMOTION and event.value != 0 or event.type == JOYBUTTONDOWN:
-                    # Movements
-                    if event.type == KEYDOWN and event.key == K_UP or event.type == JOYAXISMOTION and event.axis == 1 and event.value < 0:
-                        movement_y = -1
-                    elif event.type == KEYDOWN and event.key == K_DOWN or event.type == JOYAXISMOTION and event.axis == 1 and event.value > 0:
-                        movement_y = 1
-                    elif event.type == KEYDOWN and event.key == K_RIGHT or event.type == JOYAXISMOTION and event.axis == 0 and event.value > 0:
-                        movement_x = 1
-                    elif event.type == KEYDOWN and event.key == K_LEFT or event.type == JOYAXISMOTION and event.axis == 0 and event.value < 0:
-                        movement_x = -1
-                        
-                    # Tower selection
-                    elif event.type == KEYDOWN and event.key == K_w or event.type == JOYBUTTONDOWN and event.button == 2:
-                        towersel += 1
-                        towcurs.move(3, 0)
-                        
-                        if towersel > 3:
-                            towersel = 0
-                            towcurs.move(-12, 0)
-                            
-                    # Tower placement
-                    elif event.type == KEYDOWN and event.key == K_SPACE or event.type == JOYBUTTONDOWN and event.button == 1:
-                        if towersel == 0:
-                            tower = Tower(cursor)
-                        elif towersel == 1:
-                            tower = SlowTower(cursor)
-                        elif towersel == 2:
-                            tower = StrongerTower(cursor)
-                        elif towersel == 3:
-                            tower = StrongestTower(cursor)
-                        
-                        if Gamedata.money >= tower.cost:
-                            place = True        
-                            
-                            for p in path:
-                                if pygame.sprite.collide_rect(tower, p):
-                                    place = False
-                            
-                            if place:
-                                for t in towers:
-                                    if pygame.sprite.collide_rect(t, tower):
-                                        t.kill()
-                                towers.add(tower)
-                                Gamedata.money -= tower.cost
-                                
-                    # If both player buttons on the controller or ESC on the keyboard are pressed, end the game
-                    elif event.type == JOYBUTTONDOWN and event.button == 7:
-                        gameover += 1
-                    elif event.type == JOYBUTTONDOWN and event.button == 8:
-                        gameover += 1
-                    elif event.type == KEYDOWN and event.key == K_ESCAPE:
-                        gameover = 2
+        for pgevent in pygame.event.get():
+            if pgevent.type == QUIT:
+                pygame.quit()
+                sys.exit()
 
-                # Stop cursor movement in case of keyup or axis move to home position
-                elif event.type == KEYUP or event.type == JOYAXISMOTION and event.value == 0.0:
-                    if event.type == KEYUP and (event.key == K_UP or event.key == K_DOWN) or event.type == JOYAXISMOTION and event.axis == 1:
-                        movement_y = 0
-                    elif event.type == KEYUP and (event.key == K_RIGHT or event.key == K_LEFT) or event.type == JOYAXISMOTION and event.axis == 0:
-                        movement_x = 0
-                
-            # We tried to process an event that we should not have processed
-            except AttributeError:
-                print("AttributeError on " + str(event))
-        
+            event = process_event(pgevent)
+            # Keypresses on keyboard and joystick axis motions / button presses
+            if event.type == PUSH:
+                # Movements
+                if event.button == UP:
+                    movement_y = -1
+                elif event.button == DOWN:
+                    movement_y = 1
+                elif event.button == RIGHT:
+                    movement_x = 1
+                elif event.button == LEFT:
+                    movement_x = -1
+
+                # Tower selection
+                elif event.button == B2:
+                    towersel += 1
+                    towcurs.move(3, 0)
+
+                    if towersel > 3:
+                        towersel = 0
+                        towcurs.move(-12, 0)
+
+                # Tower placement
+                elif event.button == B1:
+                    if towersel == 0:
+                        tower = Tower(cursor)
+                    elif towersel == 1:
+                        tower = SlowTower(cursor)
+                    elif towersel == 2:
+                        tower = StrongerTower(cursor)
+                    elif towersel == 3:
+                        tower = StrongestTower(cursor)
+
+                    if Gamedata.money >= tower.cost:
+                        place = True
+
+                        for p in path:
+                            if pygame.sprite.collide_rect(tower, p):
+                                place = False
+
+                        if place:
+                            for t in towers:
+                                if pygame.sprite.collide_rect(t, tower):
+                                    t.kill()
+                            towers.add(tower)
+                            Gamedata.money -= tower.cost
+
+                # If both player buttons on the controller or ESC on the keyboard are pressed, end the game
+                elif event.button == P1:
+                    gameover += 1
+                elif event.button == P2:
+                    gameover += 1
+                elif pgevent.type == KEYDOWN and pgevent.key == K_ESCAPE:
+                    gameover = 2
+
+            # Stop cursor movement in case of keyup or axis move to home position
+            elif event.type == RELEASE:
+                if event.button == UP or event.button == DOWN:
+                    movement_y = 0
+                if event.button == LEFT or event.button == RIGHT:
+                    movement_x = 0
+
         cursor.move(movement_x, movement_y)
         
         # Count ticks independently of time so the timings wont fuck up if the CPU is slow
