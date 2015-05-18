@@ -36,12 +36,12 @@ size = ledDisplay.size()
 simDisplay = led.sim.SimDisplay(size)
 screen = pygame.Surface(size)
 
-# every time an alien spawns...
-alienFrequency = 5000
-alienSpeed = 200
-alienHp = 30.0
+# init globals
+alienFrequency = 0
+alienSpeed = 0
+alienHp = 0
 
-alienSpeedAdd = -5
+alienSpeedAdd = -1
 alienFrequencyFactor = 1.03
 alienHpFactor = 1.1
 
@@ -93,8 +93,6 @@ class Alien(pygame.sprite.Sprite, Animation):
         self.reduce_speed = 0
         
         self.updates = 0 
-
-        #self.rect.y = random.randint(0, screen.get_rect().height - self.rect.height)
 
     def update(self, *args):
         
@@ -170,7 +168,7 @@ class Tower(pygame.sprite.Sprite):
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
                 pygame.draw.line(screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
-                alien.kill(.15)
+                alien.kill(.1)
                 
 class SlowTower(Tower):
     def __init__(self, cursor):
@@ -267,9 +265,9 @@ def main():
     money = 6
     life = 3
     
-    alienFrequency = 5000.0
-    alienSpeed = 200
-    alienHp = 25.0
+    alienFrequency = 200.0
+    alienSpeed = 20
+    alienHp = 30.0
     alienHpFactor = 1.1
     
     score = 0.0
@@ -331,7 +329,9 @@ def main():
         event = pygame.event.wait()
         if event.type == KEYDOWN or event.type == JOYBUTTONDOWN:
             break
-
+    
+    tickcount = 0
+    
     while gameover < 2:
         gameover = 0
         for event in pygame.event.get():
@@ -399,22 +399,27 @@ def main():
         cursor.move(movementX, movementY)
         
         # increase difficulty
-        if (pygame.time.get_ticks() - lastAlien) > alienFrequency:
+        tickcount += 1
+        if (tickcount - lastAlien) > alienFrequency:
             # spawn new alien :)
             aliens.add(Alien(alienHp))
-            lastAlien = pygame.time.get_ticks()
+            lastAlien = tickcount
             alienHp *= alienHpFactor
             
-            if alienSpeed > 60:
+            if alienSpeed > 3:
                 alienSpeed += alienSpeedAdd
             
-            if alienFrequency > 1750:
+            if alienFrequency > 150:
                 alienFrequency /= alienFrequencyFactor
                 
-            if alienHpFactor > 1.01:
-                alienHpFactor -= 0.0025
+            if alienHpFactor > 1.015:
+                alienHpFactor -= 0.002
+            elif alienHp < 1500:
+                alienHpFactor = 1.015
+            elif alienHp >= 1500:
+                alienHpFactor = 1.01
                 
-            print("Spawned Alien... HP: %6f Speed: %3i Freq: %6f" % (alienHp, alienSpeed, alienFrequency))
+            print("Spawned Alien... HP: %6f HP Factor: %6f " % (alienHp, alienHpFactor))
 
         # .. player hit?
         targhit = pygame.sprite.spritecollideany(target, aliens)
@@ -430,7 +435,7 @@ def main():
         
         player.update()
         
-        if pygame.time.get_ticks() % alienSpeed <= 30:
+        if tickcount % alienSpeed == 0:
             aliens.update()
         else:
             for alien in aliens:
