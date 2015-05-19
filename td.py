@@ -78,7 +78,9 @@ def main():
     # Stuff that belongs to the player
     cursor = Cursor()
     target = Target()
-    
+
+    cursor.rect.center = screen.get_rect().center
+
     player = pygame.sprite.Group()
     player.add(cursor)
     player.add(target)
@@ -213,7 +215,9 @@ def main():
                     gameover1 = True
                 elif event.button == P2:
                     gameover2 = True
-                elif pgevent.type == KEYDOWN and pgevent.key == K_ESCAPE:
+
+            # Only on Keyboard
+            elif pgevent.type == KEYDOWN and pgevent.key == K_ESCAPE:
                     gameover1 = gameover2 = True
 
             # Stop cursor movement in case of keyup or axis move to home position

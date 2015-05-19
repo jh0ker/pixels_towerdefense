@@ -12,7 +12,8 @@ class Cursor(pygame.sprite.Sprite):
         self.image = pygame.image.load(os.path.join('sprite', 'cursor.png'))
         self.rect = self.image.get_rect()
 
-        self.rect.center = Gamedata.screen.get_rect().center
+        self.rect.midleft = Gamedata.screen.get_rect().midleft
+        self.rect.x = 2
 
     def move(self, x, y):
         # Allow cursor to move out of screen by one pixel
