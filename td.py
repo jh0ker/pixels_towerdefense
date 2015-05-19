@@ -227,7 +227,9 @@ def main():
                 elif event.button == P2:
                     gameover2 = False
 
-        cursor.move(movement_x, movement_y)
+        # move cursor at 50% speed
+        if tickcount % 2 == 0:
+            cursor.move(movement_x, movement_y)
         
         # Count ticks independently of time so the timings wont fuck up if the CPU is slow
         tickcount += 1
