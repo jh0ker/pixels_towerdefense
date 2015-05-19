@@ -227,12 +227,12 @@ def main():
             if alien_frequency > 150:
                 alien_frequency /= alien_frequency_factor
                 
-            if alien_hp_factor > 1.015:
+            if alien_hp_factor > 1.0175:
                 alien_hp_factor -= 0.002
             elif alien_hp < 1500:
-                alien_hp_factor = 1.015
+                alien_hp_factor = 1.0175
             elif alien_hp >= 1500:
-                alien_hp_factor = 1.01
+                alien_hp_factor = 1.0075
                 
             print("Spawned Alien... HP: %6f HP Factor: %6f " % (alien_hp, alien_hp_factor))
 
