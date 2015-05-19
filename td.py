@@ -129,14 +129,15 @@ def main():
     towcurs.move(-9, 0)
     player.add(towcurs)
     
-    gameover = 0
+    gameover1 = False
+    gameover2 = False
+
     pause = False
 
     # Clear event list before starting the game
     pygame.event.clear()
 
-    while gameover < 2:
-        gameover = 0
+    while not (gameover1 and gameover2):
 
         # Pause the game
         if pause:
@@ -209,18 +210,22 @@ def main():
                 # If both player buttons on the controller or ESC on the keyboard are pressed, end the game
                 elif event.button == P1:
                     pause = True
-                    gameover += 1
+                    gameover1 = True
                 elif event.button == P2:
-                    gameover += 1
+                    gameover2 = True
                 elif pgevent.type == KEYDOWN and pgevent.key == K_ESCAPE:
-                    gameover = 2
+                    gameover1 = gameover2 = True
 
             # Stop cursor movement in case of keyup or axis move to home position
             elif event.type == RELEASE:
                 if event.button == UP or event.button == DOWN:
                     movement_y = 0
-                if event.button == LEFT or event.button == RIGHT:
+                elif event.button == LEFT or event.button == RIGHT:
                     movement_x = 0
+                elif event.button == P1:
+                    gameover1 = False
+                elif event.button == P2:
+                    gameover2 = False
 
         cursor.move(movement_x, movement_y)
         
@@ -291,7 +296,7 @@ def main():
         ledDisplay.update(screen)
 
         if Gamedata.life == 0:
-            gameover = 2
+            gameover1 = gameover2 = True
     
         # Tick the clock
         clock.tick(30)
