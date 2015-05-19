@@ -66,6 +66,8 @@ def main():
 
     tickcount = 0
 
+    doublespeed = False
+
     # init
     clock = pygame.time.Clock()
     pygame.joystick.init()
@@ -209,7 +211,10 @@ def main():
                             towers.add(tower)
                             Gamedata.money -= tower.cost
 
-                # If both player buttons on the controller or ESC on the keyboard are pressed, end the game
+                elif event.button == B3:
+                    doublespeed = not doublespeed
+
+                # If both player buttons are pressed, end the game
                 elif event.button == P1:
                     pause = True
                     gameover1 = True
@@ -305,7 +310,10 @@ def main():
             gameover1 = gameover2 = True
     
         # Tick the clock
-        clock.tick(30)
+        if not doublespeed:
+            clock.tick(30)
+        else:
+            clock.tick(60)
         
     # End of the game
     text_gameover = "GAME OVER"
