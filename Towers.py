@@ -33,7 +33,7 @@ class Tower(pygame.sprite.Sprite):
                 alien.kill(.1)
 
                 hitcounter += 1
-                if hitcounter == 2:
+                if hitcounter == 3:
                     break
 
 
