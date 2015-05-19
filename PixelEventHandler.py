@@ -30,8 +30,8 @@ KB_P1 = K_1
 KB_P2 = K_2
 
 class PixelEvent:
-    def __init__(self, action, type, player):
-        self.button = action
+    def __init__(self, button, type, player):
+        self.button = button
         self.type = type
         self.player = player
 
