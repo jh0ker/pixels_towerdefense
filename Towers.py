@@ -24,11 +24,17 @@ class Tower(pygame.sprite.Sprite):
         t = pygame.sprite.Sprite()
         t.rect = shootrange
 
+        hitcounter = 0
+
         for alien in aliens:
             targhit = pygame.sprite.collide_circle(t, alien)
             if targhit:
                 pygame.draw.line(Gamedata.screen, SHOOT, (self.rect.x + .5, self.rect.y + .5), (alien.rect.x + .5, alien.rect.y + .5), 1)
                 alien.kill(.1)
+
+                hitcounter += 1
+                if hitcounter == 2:
+                    break
 
 
 class SlowTower(Tower):
