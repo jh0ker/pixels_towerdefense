@@ -313,7 +313,7 @@ def main():
         if not doublespeed:
             clock.tick(30)
         else:
-            clock.tick(60)
+            clock.tick(120)
         
     # End of the game
     text_gameover = "GAME OVER"
