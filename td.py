@@ -35,6 +35,20 @@ screen = pygame.Surface(size)
 Gamedata.screen = screen
 
 def main():
+
+    # Show loading message
+    pygame.font.init()
+    font_text = pygame.font.SysFont(None, 18)
+
+    text_loading = "Loading..."
+    write_loading = font_text.render(text_loading, True, LOBBY)
+
+    screen.fill(BLACK)
+    screen.blit(write_loading, (2, 4))
+
+    simDisplay.update(screen)
+    ledDisplay.update(screen)
+
     # Set local game variables
     towersel = 0
     
@@ -116,30 +130,29 @@ def main():
     player.add(towcurs)
     
     gameover = 0
-    
-    # Show lobby message
-    pygame.font.init()
-    font_text = pygame.font.SysFont(None, 18)
-    
-    text_lobby = "Towerdefense!"
-    write_lobby = font_text.render(text_lobby, True, LOBBY)
-    
-    screen.fill(BLACK)
-    screen.blit(write_lobby, (2, 4))
-    
-    simDisplay.update(screen)
-    ledDisplay.update(screen)
+    pause = False
 
+    # Clear event list before starting the game
     pygame.event.clear()
-
-    while True:
-        event = process_event(pygame.event.wait())
-        if event.type == PUSH:
-            break
 
     while gameover < 2:
         gameover = 0
-        
+
+        # Pause the game
+        if pause:
+            write_pause = font_text.render("Pause", True, WHITE)
+
+            screen.blit(write_pause, (28, 4))
+
+            simDisplay.update(screen)
+            ledDisplay.update(screen)
+
+            while True:
+                event = process_event(pygame.event.wait())
+                if event.type == PUSH and event.button == P1:
+                    pause = False
+                    break
+
         # Process event queue
         for pgevent in pygame.event.get():
             if pgevent.type == QUIT:
@@ -195,6 +208,7 @@ def main():
 
                 # If both player buttons on the controller or ESC on the keyboard are pressed, end the game
                 elif event.button == P1:
+                    pause = True
                     gameover += 1
                 elif event.button == P2:
                     gameover += 1
