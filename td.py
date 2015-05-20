@@ -8,7 +8,7 @@ from Towers import Tower, SlowTower, StrongerTower, StrongestTower
 from Colors import *
 from Cursor import Cursor
 from Target import Target
-from PixelEventHandler import *
+from led.PixelEventHandler import *
 import Gamedata
 
 """ https://github.com/jh0ker/pixels_towerdefense
